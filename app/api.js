@@ -5,10 +5,15 @@ const logger = require('./logger');
 const pkg = require('../package.json');
 const settings = require('../config/settings');
 const quotes = require('./quotes');
-quotes.load({
+
+const dataSourceConfig = process.env.QUOTES_IN_MEMORY === 'true' ? {
+  type: 'memory',
+  endpoint: []
+} : {
   type: settings.database.type,
   endpoint: settings.database.endpoint
-}).catch(err => {
+};
+quotes.load(dataSourceConfig).catch(err => {
   logger.error(err);
 });
 
