@@ -2,6 +2,7 @@
 
 process.env.DEBUG = process.env.DEBUG || 'http';
 const production = process.env.NODE_ENV === 'production';
+const port = process.env.PORT || settings.http.port;
 
 const debug = require('debug')('http');
 const express = require('express');
@@ -22,6 +23,6 @@ app.use(morgan(production ? 'combined' : 'dev', {
 }));
 
 app.use(require('./app/api').router);
-app.listen(settings.http.port, () => {
-  debug('listening on port ' + settings.http.port);
+app.listen(port, () => {
+  debug('listening on port ' + port);
 });
