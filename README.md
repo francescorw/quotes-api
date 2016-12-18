@@ -11,7 +11,7 @@ npm start
 HTTP API
 --------
 
-### GET /quotes
+### GET /quotes/random
 Response - HTTP 200
 ```json
 {
@@ -20,7 +20,7 @@ Response - HTTP 200
 }
 ```
 
-### GET /quotes?type=wildcard&query=(yeah)
+### GET /quotes/random?type=wildcard&query=(yeah)
 Response - HTTP 200
 ```json
 {

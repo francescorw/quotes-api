@@ -69,7 +69,7 @@ api.post('/quotes', (req, res) => {
   });
 });
 
-api.get('/quotes', (req, res) => {
+api.get('/quotes/random', (req, res) => {
   const search = req.query;
 
   if (search.type === "wildcard" && search.query) {
