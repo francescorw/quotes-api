@@ -4,10 +4,7 @@ const quotes = this;
 const _ = require('underscore');
 
 this.localDb = [];
-
-const defaultDataSource = [];
-
-this.repo = require('./quotesMemoryRepository')(defaultDataSource);
+this.repo = require('./quotesMemoryRepository')([]);
 
 const getLeastOccurrenceRandom = collection => {
   collection = _.sortBy(collection, quote => quote.occurrences);
