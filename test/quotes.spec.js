@@ -8,7 +8,7 @@ describe('quotes', () => {
     const data = [{
       nickname: 'Sarah',
       channel: '#thewhiteroom',
-      mask: 'Sarah!tech@buymore.com',
+      mask: 'Sarah!agent@cia.gov',
       quote: '<Chuck> guys, I know kung fu'
     }, {
       nickname: 'samaritan',
