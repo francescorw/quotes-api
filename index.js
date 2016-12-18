@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const settings = require('./config/settings');
 process.env.DEBUG = process.env.DEBUG || 'http';
 const production = process.env.NODE_ENV === 'production';
 const port = process.env.PORT || settings.http.port;
@@ -9,7 +10,6 @@ const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 
-const settings = require('./config/settings');
 const app = express();
 
 app.use(bodyParser.json());
