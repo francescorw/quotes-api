@@ -13,15 +13,13 @@ const app = express();
 
 app.use(bodyParser.json());
 
-if (!production) {
-  app.use(morgan('dev', {
-    stream: {
-      write: (str) => {
-        debug(str.trim())
-      },
+app.use(morgan(production ? 'combined' : 'dev', {
+  stream: {
+    write: (str) => {
+      debug(str.trim())
     },
-  }));
-}
+  },
+}));
 
 app.use(require('./app/api').router);
 app.listen(settings.http.port, () => {
