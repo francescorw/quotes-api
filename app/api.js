@@ -5,7 +5,10 @@ const logger = require('./logger');
 const pkg = require('../package.json');
 const settings = require('../config/settings');
 const quotes = require('./quotes');
-quotes.load(settings.database.path).catch(err => {
+quotes.load({
+  type: settings.database.type,
+  endpoint: settings.database.endpoint
+}).catch(err => {
   logger.error(err);
 });
 

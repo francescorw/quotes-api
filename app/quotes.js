@@ -33,23 +33,42 @@ const arrayToLocalDb = data => {
   }));
 }
 
+const loadFromCsv = filePath => {
+  return new Promise((accept, reject) => {
+    fs.readFile(filePath, (err, data) => {
+      if (err)
+        reject();
+
+      parse(data, {
+        columns: true
+      }, (err, output) => {
+        if (err)
+          reject();
+
+        localDb = arrayToLocalDb(output);
+        accept();
+      });
+    });
+  });
+}
+
 const pushToSource = (source, item) => {
   return new Promise((accept, reject) => {
-    if (_.isString(source)) {
+    if (source.type === 'csv') {
       stringify([item], {
         columns: ["timestamp", "nickname", "mask", "channel", "quote"],
         eof: false
       }, (err, output) => {
-        fs.appendFile(source, '\r\n' + output, (err) => {
+        fs.appendFile(source.endpoint, '\r\n' + output, (err) => {
           if (err)
             reject('cannot add quote');
 
           accept();
         });
       });
-    } else if (_.isArray(source)) {
+    } else if (source.type === 'memory') {
       try {
-        source.push(item);
+        source.endpoint.push(item);
         accept();
       } catch (err) {
         reject(err);
@@ -62,24 +81,24 @@ const replaceSource = (source, localDb) => {
   return new Promise((accept, reject) => {
     let mappedDb = _.chain(localDb).map(item => item.item).sortBy(item => parseInt(item.id)).value();
 
-    if (_.isString(source)) {
+    if (source.type === 'csv') {
       stringify(mappedDb, {
         columns: ["timestamp", "nickname", "mask", "channel", "quote"],
         eof: false,
         header: true
       }, (err, output) => {
-        fs.writeFile(source, output, (err) => {
+        fs.writeFile(source.endpoint, output, (err) => {
           if (err)
             reject('cannot replace source');
 
           accept();
         });
       });
-    } else if (_.isArray(source)) {
+    } else if (source.type === 'memory') {
       try {
-        source.length = 0;
+        source.endpoint.length = 0;
         _.each(mappedDb, quote => {
-          source.push(quote);
+          source.endpoint.push(quote);
         });
         accept();
       } catch (err) {
@@ -94,24 +113,17 @@ exports.load = (source) => {
 
     quotes.source = source;
 
-    if (_.isString(source)) {
-      fs.readFile(source, (err, data) => {
-        if (err)
-          reject('cannot load quotes');
-
-        parse(data, {
-          columns: true
-        }, (err, output) => {
-          if (err)
-            reject('cannot load quotes');
-
-          localDb = arrayToLocalDb(output);
-          accept();
-        });
-      });
-    } else if (_.isArray(source)) {
-      localDb = arrayToLocalDb(source);
+    if (source.type === 'csv') {
+      loadFromCsv(source.endpoint).then(() => {
+        accept();
+      }).catch(() => {
+        reject('cannot load quotes');
+      })
+    } else if (source.type === 'memory') {
+      localDb = arrayToLocalDb(source.endpoint);
       accept();
+    } else {
+      throw 'not supported datasource';
     }
   });
 };

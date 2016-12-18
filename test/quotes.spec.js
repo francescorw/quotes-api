@@ -22,7 +22,10 @@ describe('quotes', () => {
       quote: '<jack_ass> we have to go back'
     }];
 
-    quotes.load(data).then(() => done()).catch(() => done(new Error()));
+    quotes.load({
+      type: 'memory',
+      endpoint: data
+    }).then(() => done()).catch(() => done(new Error()));
   });
 
   it('should add new quote', done => {

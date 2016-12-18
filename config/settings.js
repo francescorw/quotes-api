@@ -10,5 +10,6 @@ exports.logging = {
 }
 
 exports.database = {
-  path: 'data/db.csv'
+  type: 'csv',
+  endpoint: 'data/db.csv'
 }
