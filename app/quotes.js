@@ -3,15 +3,12 @@
 const quotes = this;
 const _ = require('underscore');
 const fs = require('fs');
-const stringify = require('csv-stringify');
-const parse = require('csv-parse');
 
 this.localDb = [];
-this.source = {
-  type: 'memory',
-  endpoint: []
-};
 
+const defaultDataSource = [];
+
+this.repo = require('./quotesMemoryRepository')(defaultDataSource);
 
 const getLeastOccurrenceRandom = collection => {
   collection = _.sortBy(collection, quote => quote.occurrences);
@@ -27,108 +24,27 @@ const getLeastOccurrenceRandom = collection => {
   return chosen;
 }
 
-const arrayToLocalDb = data => {
-  return _.shuffle(_.map(data, (quote, index) => {
-    quote.id = (index + 1).toString();
-    return {
-      occurrences: 1,
-      item: quote
-    };
-  }));
-}
-
-const loadFromCsv = filePath => {
-  return new Promise((accept, reject) => {
-    fs.readFile(filePath, (err, data) => {
-      if (err)
-        reject();
-
-      parse(data, {
-        columns: true
-      }, (err, output) => {
-        if (err)
-          reject();
-
-        quotes.localDb = arrayToLocalDb(output);
-        accept();
-      });
-    });
-  });
-}
-
-const pushToSource = (source, item) => {
-  return new Promise((accept, reject) => {
-    if (source.type === 'csv') {
-      stringify([item], {
-        columns: ["timestamp", "nickname", "mask", "channel", "quote"],
-        eof: false
-      }, (err, output) => {
-        fs.appendFile(source.endpoint, '\r\n' + output, (err) => {
-          if (err)
-            reject('cannot add quote');
-
-          accept();
-        });
-      });
-    } else if (source.type === 'memory') {
-      try {
-        source.endpoint.push(item);
-        accept();
-      } catch (err) {
-        reject(err);
-      }
-    }
-  });
-}
-
-const replaceSource = (source, localDb) => {
-  return new Promise((accept, reject) => {
-    let mappedDb = _.chain(localDb).map(item => item.item).sortBy(item => parseInt(item.id)).value();
-
-    if (source.type === 'csv') {
-      stringify(mappedDb, {
-        columns: ["timestamp", "nickname", "mask", "channel", "quote"],
-        eof: false,
-        header: true
-      }, (err, output) => {
-        fs.writeFile(source.endpoint, output, (err) => {
-          if (err)
-            reject('cannot replace source');
-
-          accept();
-        });
-      });
-    } else if (source.type === 'memory') {
-      try {
-        source.endpoint.length = 0;
-        _.each(mappedDb, quote => {
-          source.endpoint.push(quote);
-        });
-        accept();
-      } catch (err) {
-        reject(err);
-      }
-    }
-  });
+const repoFactory = (type, endpoint) => {
+  switch (type) {
+    case 'csv':
+      return require('./quotesCsvRepository.js')(endpoint);
+      break;
+    case 'memory':
+      return require('./quotesMemoryRepository.js')(endpoint);
+      break;
+    default:
+      throw 'not supported datasource';
+  }
 };
 
 exports.load = (source) => {
   return new Promise((accept, reject) => {
+    quotes.repo = repoFactory(source.type, source.endpoint);
 
-    quotes.source = source;
-
-    if (source.type === 'csv') {
-      loadFromCsv(source.endpoint).then(() => {
-        accept();
-      }).catch(() => {
-        reject('cannot load quotes');
-      })
-    } else if (source.type === 'memory') {
-      quotes.localDb = arrayToLocalDb(source.endpoint);
+    quotes.repo.load().then(data => {
+      quotes.localDb = data;
       accept();
-    } else {
-      throw 'not supported datasource';
-    }
+    }).catch(() => reject('cannot load quotes'));
   });
 };
 
@@ -141,7 +57,8 @@ exports.add = (quote) => {
       occurrences: 1,
       item: quote
     });
-    pushToSource(quotes.source, quote).then(() => {
+
+    quotes.repo.add(quote).then(() => {
       accept(id);
     }).catch(() => {
       reject('cannot add quote');
@@ -195,7 +112,7 @@ exports.deleteById = (id) => {
     try {
       const quote = getById(id);
       quotes.localDb = _.without(quotes.localDb, quote);
-      replaceSource(quotes.source, quotes.localDb).then(() => {
+      quotes.repo.syncronize(quotes.localDb).then(() => {
         accept();
       }).catch(err => {
         reject(err)
