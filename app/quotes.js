@@ -20,7 +20,7 @@ const getLeastOccurrenceRandom = collection => {
 
   const chosen = _.sample(collection);
   chosen.occurrences++;
-  return _.sample(collection);
+  return chosen;
 }
 
 const arrayToLocalDb = data => {
