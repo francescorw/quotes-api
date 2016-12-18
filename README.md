@@ -20,14 +20,7 @@ Response - HTTP 200
 }
 ```
 
-### GET /quotes
-Request
-```json
-{
-      "type": "re",
-      "query": "(yeah)"
-}
-```
+### GET /quotes?type=wildcard&query=(yeah)
 Response - HTTP 200
 ```json
 {
