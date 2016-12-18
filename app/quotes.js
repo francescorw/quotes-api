@@ -6,8 +6,12 @@ const fs = require('fs');
 const stringify = require('csv-stringify');
 const parse = require('csv-parse');
 
-let source = null;
-let localDb = [];
+this.localDb = [];
+this.source = {
+  type: 'memory',
+  endpoint: []
+};
+
 
 const getLeastOccurrenceRandom = collection => {
   collection = _.sortBy(collection, quote => quote.occurrences);
@@ -45,7 +49,7 @@ const loadFromCsv = filePath => {
         if (err)
           reject();
 
-        localDb = arrayToLocalDb(output);
+        quotes.localDb = arrayToLocalDb(output);
         accept();
       });
     });
@@ -120,7 +124,7 @@ exports.load = (source) => {
         reject('cannot load quotes');
       })
     } else if (source.type === 'memory') {
-      localDb = arrayToLocalDb(source.endpoint);
+      quotes.localDb = arrayToLocalDb(source.endpoint);
       accept();
     } else {
       throw 'not supported datasource';
@@ -130,10 +134,10 @@ exports.load = (source) => {
 
 exports.add = (quote) => {
   return new Promise((accept, reject) => {
-    let id = (localDb.length + 1).toString();
+    let id = (quotes.localDb.length + 1).toString();
     quote.id = id;
     quote.timestamp = Math.floor(+new Date() / 1000);
-    localDb.push({
+    quotes.localDb.push({
       occurrences: 1,
       item: quote
     });
@@ -148,7 +152,7 @@ exports.add = (quote) => {
 exports.get = (pattern) => {
   return new Promise((accept, reject) => {
     try {
-      let subset = localDb;
+      let subset = quotes.localDb;
       if (pattern) {
         const re = new RegExp(pattern);
         subset = _.filter(subset, (quote) => re.test(quote.item.quote));
@@ -164,7 +168,7 @@ exports.get = (pattern) => {
 };
 
 const getById = id => {
-  const quote = _.find(localDb, (quote) => quote.item.id === id);
+  const quote = _.find(quotes.localDb, (quote) => quote.item.id === id);
 
   if (quote === undefined) {
     throw 'quote not found';
@@ -190,8 +194,8 @@ exports.deleteById = (id) => {
   return new Promise((accept, reject) => {
     try {
       const quote = getById(id);
-      localDb = _.without(localDb, quote);
-      replaceSource(quotes.source, localDb).then(() => {
+      quotes.localDb = _.without(quotes.localDb, quote);
+      replaceSource(quotes.source, quotes.localDb).then(() => {
         accept();
       }).catch(err => {
         reject(err)
