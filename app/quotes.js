@@ -4,7 +4,7 @@ const quotes = this;
 const _ = require('underscore');
 
 this.localDb = [];
-this.repo = require('./quotesMemoryRepository')([]);
+this.repo = require('./repo/memory')([]);
 
 const getLeastOccurrenceRandom = collection => {
   collection = _.sortBy(collection, quote => quote.occurrences);
@@ -23,10 +23,10 @@ const getLeastOccurrenceRandom = collection => {
 const repoFactory = (type, endpoint) => {
   switch (type) {
     case 'csv':
-      return require('./quotesCsvRepository.js')(endpoint);
+      return require('./repo/csv.js')(endpoint);
       break;
     case 'memory':
-      return require('./quotesMemoryRepository.js')(endpoint);
+      return require('./repo/memory.js')(endpoint);
       break;
     default:
       throw 'not supported datasource';
