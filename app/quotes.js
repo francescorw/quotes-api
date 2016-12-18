@@ -2,7 +2,6 @@
 
 const quotes = this;
 const _ = require('underscore');
-const fs = require('fs');
 
 this.localDb = [];
 
