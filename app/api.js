@@ -77,51 +77,80 @@ api.get('/quotes', (req, res) => {
   }
 
   quotes.get(search.query).then(result => {
-    res.json({
-      total: result.total,
-      quote: result.quote.quote
-    });
+
+    if (_.isEmpty(result)) {
+      res.status(404).json({
+        message: 'quote not found'
+      });
+    } else {
+      res.json({
+        total: result.total,
+        quote: result.quote.quote
+      });
+    }
   }).catch(() => {
-    res.status(404).json({
-      message: 'quote not found'
+    res.status(500).json({
+      message: 'something bad happened'
     });
   });
 });
 
 api.get('/quotes/:id', (req, res) => {
   quotes.getById(req.params.id).then(result => {
-    res.json({
-      quote: result.quote.quote
-    });
+    if (_.isEmpty(result)) {
+      res.status(404).json({
+        message: 'quote not found'
+      });
+    } else {
+      res.json({
+        quote: result.quote.quote
+      });
+    }
+
   }).catch(() => {
-    res.status(404).json({
-      message: 'quote not found'
+    res.status(500).json({
+      message: 'something bad happened'
     });
   });
 });
 
 api.get('/quotes/:id/info', (req, res) => {
   quotes.getById(req.params.id).then(result => {
-    const info = {
-      nickname: result.quote.nickname,
-      timestamp: new Date(result.quote.timestamp * 1000),
-      channel: result.quote.channel
-    };
 
-    res.json(info);
+    if (_.isEmpty(result)) {
+      res.status(404).json({
+        message: 'quote not found'
+      });
+    } else {
+      const info = {
+        nickname: result.quote.nickname,
+        timestamp: new Date(result.quote.timestamp * 1000),
+        channel: result.quote.channel
+      };
+
+      res.json(info);
+    }
   }).catch(() => {
-    res.status(404).json({
-      message: 'quote not found'
+    res.status(500).json({
+      message: 'something bad happened'
     });
   });
 });
 
 api.delete('/quotes/:id', (req, res) => {
-  quotes.deleteById(req.params.id).then(result => {
-    logger.info('added quote with id ' + req.params.id);
-    res.json({
-      success: true
-    });
+  quotes.getById(req.params.id).then(result => {
+    if (result === undefined) {
+      res.status(404).json({
+        message: 'quote not found'
+      });
+    } else {
+      quotes.delete(result.quote).then(result => {
+        logger.info('added quote with id ' + req.params.id);
+        res.json({
+          success: true
+        });
+      });
+    }
   }).catch(() => {
     res.status(500).json({
       success: false

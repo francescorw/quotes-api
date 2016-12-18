@@ -56,17 +56,22 @@ describe('quotes', () => {
   });
 
   it('should not return a quote', done => {
-    quotes.get('(fdsegewq)').catch(err => {
-      test.string(err).isEqualTo('quote not found');
+    quotes.get('(fdsegewq)').then(result => {
+      test.undefined(result).undefined();
       done();
+    }).catch(err => {
+      done(err);
     });
   });
 
   it('should delete a quote', done => {
-    quotes.deleteById("2").then(result => {
-      quotes.getById("2").then().catch(err => {
-        done();
-      });
-    }).catch(() => done(new Error()));
+    quotes.getById("2").then(quote => {
+      quotes.delete(quote.quote).then(result => {
+        quotes.getById("2").then(q => {
+          test.undefined(q).undefined();
+          done();
+        }).catch(err => done(err));
+      }).catch(err => done(err));
+    }).catch(err => done(err));
   });
 });

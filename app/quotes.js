@@ -12,7 +12,7 @@ const getLeastOccurrenceRandom = collection => {
   collection = _.filter(collection, quote => quote.occurrences == first.occurrences);
 
   if (_.isEmpty(collection)) {
-    throw 'quote not found';
+    return;
   }
 
   const chosen = _.sample(collection);
@@ -70,10 +70,17 @@ exports.get = (pattern) => {
         const re = new RegExp(pattern);
         subset = _.filter(subset, (quote) => re.test(quote.item.quote));
       }
-      accept({
-        total: subset.length,
-        quote: getLeastOccurrenceRandom(subset).item
-      });
+
+      const quote = getLeastOccurrenceRandom(subset);
+
+      if (quote === undefined) {
+        accept();
+      } else {
+        accept({
+          total: subset.length,
+          quote: quote.item
+        });
+      }
     } catch (err) {
       reject(err);
     }
@@ -81,33 +88,32 @@ exports.get = (pattern) => {
 };
 
 const getById = id => {
-  const quote = _.find(quotes.localDb, (quote) => quote.item.id === id);
-
-  if (quote === undefined) {
-    throw 'quote not found';
-  }
-
-  return quote;
+  return _.find(quotes.localDb, (quote) => quote.item.id === id);
 };
 
 exports.getById = (id) => {
   return new Promise((accept, reject) => {
     try {
       const quote = getById(id);
-      accept({
-        quote: quote.item
-      });
+
+      if (quote === undefined) {
+        accept();
+      } else {
+        accept({
+          quote: quote.item
+        });
+      }
     } catch (err) {
       reject(err);
     }
   });
 };
 
-exports.deleteById = (id) => {
+exports.delete = (quote) => {
   return new Promise((accept, reject) => {
     try {
-      const quote = getById(id);
-      quotes.localDb = _.without(quotes.localDb, quote);
+      const localDbQuoteInstance = _.find(quotes.localDb, item => item.item === quote);
+      quotes.localDb = _.without(quotes.localDb, localDbQuoteInstance);
       quotes.repo.syncronize(quotes.localDb).then(() => {
         accept();
       }).catch(err => {
