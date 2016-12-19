@@ -10,8 +10,8 @@ const dataSourceConfig = process.env.QUOTES_IN_MEMORY === 'true' ? {
   type: 'memory',
   endpoint: []
 } : {
-  type: settings.database.type,
-  endpoint: settings.database.endpoint
+  type: process.env.DBTYPE || settings.database.type,
+  endpoint: process.env.DBENDPOINT || settings.database.endpoint
 };
 quotes.load(dataSourceConfig).catch(err => {
   logger.error(err);

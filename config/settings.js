@@ -10,6 +10,6 @@ exports.logging = {
 }
 
 exports.database = {
-  type: process.env.DBTYPE || 'csv',
-  endpoint: process.env.DBENDPOINT || 'data/db.csv'
+  type: 'csv',
+  endpoint: 'data/db.csv'
 }
