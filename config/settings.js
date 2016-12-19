@@ -10,6 +10,6 @@ exports.logging = {
 }
 
 exports.database = {
-  type: 'csv',
-  endpoint: 'data/db.csv'
+  type: 'csv', // redis
+  endpoint: 'data/db.csv' // redis://server-host:6379
 }

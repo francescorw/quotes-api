@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const settings = require('./config/settings');
-process.env.DEBUG = process.env.DEBUG || 'http';
+process.env.DEBUG = process.env.DEBUG || 'http,redis';
 const production = process.env.NODE_ENV === 'production';
 const port = process.env.PORT || settings.http.port;
 
