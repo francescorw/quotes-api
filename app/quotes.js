@@ -23,11 +23,11 @@ const getLeastOccurrenceRandom = collection => {
 const repoFactory = (type, endpoint) => {
   switch (type) {
     case 'csv':
-      return require('./repo/csv.js')(endpoint);
-      break;
+      return require('./repo/csv')(endpoint);
     case 'memory':
-      return require('./repo/memory.js')(endpoint);
-      break;
+      return require('./repo/memory')(endpoint);
+    case 'redis':
+      return require('./repo/redis')(endpoint);
     default:
       throw 'not supported datasource';
   }
