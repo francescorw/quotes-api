@@ -1,15 +1,15 @@
 'use strict';
 
 exports.http = {
-  port: 18111
+  port: process.env.PORT || 18111
 };
 
 exports.logging = {
-  level: 'info',
-  fileName: 'log/quotes.log'
+  level: process.env.LOGLEVEL || 'info',
+  fileName: process.env.LOGFILE || 'log/quotes.log'
 }
 
 exports.database = {
-  type: 'csv',
-  endpoint: 'data/db.csv'
+  type: process.env.DBTYPE || 'redis',
+  endpoint: process.env.DBENDPOINT || 'localhost:6397'
 }

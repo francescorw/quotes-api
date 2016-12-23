@@ -6,14 +6,10 @@ const pkg = require('../package.json');
 const settings = require('../config/settings');
 const quotes = require('./quotes');
 
-const dataSourceConfig = process.env.QUOTES_IN_MEMORY === 'true' ? {
-  type: 'memory',
-  endpoint: []
-} : {
-  type: process.env.DBTYPE || settings.database.type,
-  endpoint: process.env.DBENDPOINT || settings.database.endpoint
-};
-quotes.load(dataSourceConfig).catch(err => {
+quotes.load({
+  type: settings.database.type,
+  endpoint: settings.database.endpoint
+}).catch(err => {
   logger.error(err);
 });
 

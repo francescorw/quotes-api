@@ -25,7 +25,7 @@ const repoFactory = (type, endpoint) => {
     case 'csv':
       return require('./repo/csv')(endpoint);
     case 'memory':
-      return require('./repo/memory')(endpoint);
+      return require('./repo/memory')(_.isArray(endpoint) ? endpoint : []);
     case 'redis':
       return require('./repo/redis')(endpoint);
     default:
