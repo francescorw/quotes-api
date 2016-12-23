@@ -141,7 +141,7 @@ api.delete('/quotes/:id', (req, res) => {
       });
     } else {
       quotes.delete(result.quote).then(result => {
-        logger.info('added quote with id ' + req.params.id);
+        logger.info('deleted quote with id ' + req.params.id);
         res.json({
           success: true
         });
