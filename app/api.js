@@ -81,7 +81,8 @@ api.get('/quotes/random', (req, res) => {
     } else {
       res.json({
         total: result.total,
-        quote: result.quote.quote
+        quote: result.quote.quote,
+        id: result.quote.id
       });
     }
   }).catch(() => {
