@@ -124,3 +124,21 @@ exports.delete = (quote) => {
     }
   });
 };
+
+exports.patch = (existing_quote, patched_quote) => {
+  return new Promise((accept, reject) => {
+    try {
+      const localDbQuoteInstance = _.find(quotes.localDb, item => item.item === existing_quote);
+      localDbQuoteInstance.item.quote = patched_quote.quote;
+      localDbQuoteInstance.item.update_by = patched_quote.update_by;
+      localDbQuoteInstance.item.update_timestamp = Math.floor(+new Date() / 1000);
+      quotes.repo.syncronize(quotes.localDb).then(() => {
+        accept();
+      }).catch(err => {
+        reject(err)
+      });
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
