@@ -64,6 +64,24 @@ describe('quotes', () => {
     });
   });
 
+  it('should patch a quote', done => {
+    quotes.getById("2").then(result => {
+      const patched_quote = {
+        quote: 'What a save!',
+        update_by: 'Psyonix',
+      };
+
+      quotes.patch(result.quote, patched_quote).then(result => {
+        quotes.getById("2").then(q => {
+          test.string(q.quote.quote).is(patched_quote.quote);
+          test.string(q.quote.update_by).is(patched_quote.update_by);
+          test.number(q.quote.update_timestamp);
+          done();
+        }).catch(err => done(err));
+      }).catch(err => done(err));
+    }).catch(err => done(err));
+  });
+
   it('should delete a quote', done => {
     quotes.getById("2").then(quote => {
       quotes.delete(quote.quote).then(result => {
