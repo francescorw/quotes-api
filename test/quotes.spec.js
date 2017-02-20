@@ -25,7 +25,7 @@ describe('quotes', () => {
     quotes.load({
       type: 'memory',
       endpoint: data
-    }).then(() => done()).catch(done);
+    }).then(done).catch(done);
   });
 
   it('should add new quote', done => {
@@ -59,37 +59,42 @@ describe('quotes', () => {
     quotes.get('(fdsegewq)').then(result => {
       test.undefined(result).undefined();
       done();
-    }).catch(err => {
-      done(err);
-    });
+    }).catch(done);
   });
 
   it('should patch a quote', done => {
-    quotes.getById("2").then(result => {
-      const patched_quote = {
-        quote: 'What a save!',
-        update_by: 'Psyonix',
-      };
-
-      quotes.patch(result.quote, patched_quote).then(result => {
-        quotes.getById("2").then(q => {
-          test.string(q.quote.quote).is(patched_quote.quote);
-          test.string(q.quote.update_by).is(patched_quote.update_by);
-          test.number(q.quote.update_timestamp);
-          done();
-        }).catch(err => done(err));
-      }).catch(err => done(err));
-    }).catch(err => done(err));
+    const patched_quote = {
+      quote: 'What a save!',
+      update_by: 'Psyonix',
+    };
+    quotes.getById("2")
+      .then(result => {
+        return quotes.patch(result.quote, patched_quote);
+      })
+      .then(result => {
+        return quotes.getById("2");
+      })
+      .then(result => {
+        test.string(result.quote.quote).is(patched_quote.quote);
+        test.string(result.quote.update_by).is(patched_quote.update_by);
+        test.number(result.quote.update_timestamp);
+        done();
+      })
+      .catch(done);
   });
 
   it('should delete a quote', done => {
-    quotes.getById("2").then(quote => {
-      quotes.delete(quote.quote).then(result => {
-        quotes.getById("2").then(q => {
-          test.undefined(q).undefined();
-          done();
-        }).catch(err => done(err));
-      }).catch(err => done(err));
-    }).catch(err => done(err));
+    quotes.getById("2")
+      .then(result => {
+        return quotes.delete(result.quote);
+      })
+      .then(result => {
+        return quotes.getById("2");
+      })
+      .then(result => {
+        test.undefined(result).undefined();
+        done();
+      })
+      .catch(done);
   });
 });
