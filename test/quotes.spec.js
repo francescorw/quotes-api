@@ -25,71 +25,84 @@ describe('quotes', () => {
     quotes.load({
       type: 'memory',
       endpoint: data
-    }).then(() => done()).catch(() => done(new Error()));
+    }).then(done).catch(done);
   });
 
-  it('should add new quote', done => {
-    const quote = {
-      nickname: 'Ferdi',
-      channel: '#support',
-      mask: 'ferdi!big@brother',
-      quote: '<piehdd> thats stupid <frw> so\'s your face man'
-    };
-    quotes.add(quote).then(result => {
-      test.string(result).isNotEmpty();
-      done();
-    }).catch(() => done(new Error()));
-  });
-
-  it('should return random quote', done => {
-    quotes.get().then(result => {
-      test.string(result.quote.quote).isNotEmpty();
-      done();
-    }).catch(() => done(new Error()));
-  });
-
-  it('should return a quote containing \'yeah\'', done => {
-    quotes.get('(yeah)').then(result => {
-      test.string(result.quote.quote).isValid(/(yeah)/);
-      done();
-    }).catch(() => done(new Error()));
-  });
-
-  it('should not return a quote', done => {
-    quotes.get('(fdsegewq)').then(result => {
-      test.undefined(result).undefined();
-      done();
-    }).catch(err => {
-      done(err);
+  describe('#add', () => {
+    it('adds a new quote', done => {
+      const quote = {
+        nickname: 'Ferdi',
+        channel: '#support',
+        mask: 'ferdi!big@brother',
+        quote: '<piehdd> thats stupid <frw> so\'s your face man'
+      };
+      quotes.add(quote).then(result => {
+        test.string(result).isNotEmpty();
+        done();
+      }).catch(done);
     });
   });
 
-  it('should patch a quote', done => {
-    quotes.getById("2").then(result => {
+  describe('#get', () => {
+    it('returns a random quote when there are no parameters', done => {
+      quotes.get().then(result => {
+        test.string(result.quote.quote).isNotEmpty();
+        done();
+      }).catch(done);
+    });
+
+    it('returns the correct quote when given a pattern', done => {
+      quotes.get('(yeah)').then(result => {
+        test.string(result.quote.quote).isValid(/(yeah)/);
+        done();
+      }).catch(done);
+    });
+
+    it('does not return a quote when no matching quotes exist', done => {
+      quotes.get('(fdsegewq)').then(result => {
+        test.undefined(result);
+        done();
+      }).catch(done);
+    });
+  });
+
+  describe('#patch', () => {
+    it('patches an existing quote', done => {
       const patched_quote = {
         quote: 'What a save!',
         update_by: 'Psyonix',
       };
-
-      quotes.patch(result.quote, patched_quote).then(result => {
-        quotes.getById("2").then(q => {
-          test.string(q.quote.quote).is(patched_quote.quote);
-          test.string(q.quote.update_by).is(patched_quote.update_by);
-          test.number(q.quote.update_timestamp);
+      quotes.getById('2')
+        .then(result => {
+          return quotes.patch(result.quote, patched_quote);
+        })
+        .then(result => {
+          return quotes.getById('2');
+        })
+        .then(result => {
+          test.string(result.quote.quote).is(patched_quote.quote);
+          test.string(result.quote.update_by).is(patched_quote.update_by);
+          test.number(result.quote.update_timestamp);
           done();
-        }).catch(err => done(err));
-      }).catch(err => done(err));
-    }).catch(err => done(err));
+        })
+        .catch(done);
+    });
   });
 
-  it('should delete a quote', done => {
-    quotes.getById("2").then(quote => {
-      quotes.delete(quote.quote).then(result => {
-        quotes.getById("2").then(q => {
-          test.undefined(q).undefined();
+  describe('#delete', () => {
+    it('deletes an existing quote', done => {
+      quotes.getById('2')
+        .then(result => {
+          return quotes.delete(result.quote);
+        })
+        .then(result => {
+          return quotes.getById('2');
+        })
+        .then(result => {
+          test.undefined(result);
           done();
-        }).catch(err => done(err));
-      }).catch(err => done(err));
-    }).catch(err => done(err));
+        })
+        .catch(done);
+    });
   });
 });

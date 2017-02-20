@@ -16,55 +16,56 @@ module.exports = (filePath) => {
   this.load = () => {
     return new Promise((accept, reject) => {
       fs.readFile(repo.filePath, (err, data) => {
-        if (err)
-          reject();
+        if (err) {
+          return reject(err);
+        }
 
         parse(data, {
           columns: true
         }, (err, output) => {
-          if (err)
-            reject();
-
+          if (err) {
+            return reject(err);
+          }
           accept(arrayToLocalDb(output));
         });
       });
     });
-  }
+  };
 
   this.add = (item) => {
     return new Promise((accept, reject) => {
       stringify([item], {
-        columns: ["timestamp", "nickname", "mask", "channel", "quote"],
+        columns: ['timestamp', 'nickname', 'mask', 'channel', 'quote'],
         eof: false
       }, (err, output) => {
         fs.appendFile(repo.filePath, '\r\n' + output, (err) => {
-          if (err)
-            reject('cannot add quote');
-
+          if (err) {
+            return reject(err);
+          }
           accept();
         });
       });
     });
-  }
+  };
 
   this.syncronize = (target) => {
     return new Promise((accept, reject) => {
       const mappedDb = mapDb(target);
 
       stringify(mappedDb, {
-        columns: ["timestamp", "nickname", "mask", "channel", "quote"],
+        columns: ['timestamp', 'nickname', 'mask', 'channel', 'quote'],
         eof: false,
         header: true
       }, (err, output) => {
         fs.writeFile(repo.filePath, output, (err) => {
-          if (err)
-            reject('cannot syncronize with csv source');
-
+          if (err) {
+            return reject(err);
+          }
           accept();
         });
       });
     });
-  }
+  };
 
   return repo;
 };

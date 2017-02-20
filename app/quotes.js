@@ -18,7 +18,7 @@ const getLeastOccurrenceRandom = collection => {
   const chosen = _.sample(collection);
   chosen.occurrences++;
   return chosen;
-}
+};
 
 const repoFactory = (type, endpoint) => {
   switch (type) {
@@ -34,31 +34,28 @@ const repoFactory = (type, endpoint) => {
 };
 
 exports.load = (source) => {
-  return new Promise((accept, reject) => {
+  try {
     quotes.repo = repoFactory(source.type, source.endpoint);
+  } catch (err) {
+    return Promise.reject(err);
+  }
 
-    quotes.repo.load().then(data => {
-      quotes.localDb = data;
-      accept();
-    }).catch(() => reject('cannot load quotes'));
+  return quotes.repo.load().then(data => {
+    quotes.localDb = data;
   });
 };
 
 exports.add = (quote) => {
-  return new Promise((accept, reject) => {
-    let id = (quotes.localDb.length + 1).toString();
-    quote.id = id;
-    quote.timestamp = Math.floor(+new Date() / 1000);
-    quotes.localDb.push({
-      occurrences: 1,
-      item: quote
-    });
+  quote.id = (quotes.localDb.length + 1).toString();
+  quote.timestamp = Math.floor(+new Date() / 1000);
 
-    quotes.repo.add(quote).then(() => {
-      accept(id);
-    }).catch(() => {
-      reject('cannot add quote');
-    });
+  quotes.localDb.push({
+    occurrences: 1,
+    item: quote
+  });
+
+  return quotes.repo.add(quote).then(() => {
+    return quote.id;
   });
 };
 
@@ -87,14 +84,10 @@ exports.get = (pattern) => {
   });
 };
 
-const getById = id => {
-  return _.find(quotes.localDb, (quote) => quote.item.id === id);
-};
-
 exports.getById = (id) => {
   return new Promise((accept, reject) => {
     try {
-      const quote = getById(id);
+      const quote = _.find(quotes.localDb, (quote) => quote.item.id === id);
 
       if (quote === undefined) {
         accept();
@@ -110,35 +103,17 @@ exports.getById = (id) => {
 };
 
 exports.delete = (quote) => {
-  return new Promise((accept, reject) => {
-    try {
-      const localDbQuoteInstance = _.find(quotes.localDb, item => item.item === quote);
-      quotes.localDb = _.without(quotes.localDb, localDbQuoteInstance);
-      quotes.repo.syncronize(quotes.localDb).then(() => {
-        accept();
-      }).catch(err => {
-        reject(err)
-      });
-    } catch (err) {
-      reject(err);
-    }
-  });
+  const localDbQuoteInstance = _.find(quotes.localDb, item => item.item === quote);
+  quotes.localDb = _.without(quotes.localDb, localDbQuoteInstance);
+
+  return quotes.repo.syncronize(quotes.localDb);
 };
 
 exports.patch = (existing_quote, patched_quote) => {
-  return new Promise((accept, reject) => {
-    try {
-      const localDbQuoteInstance = _.find(quotes.localDb, item => item.item === existing_quote);
-      localDbQuoteInstance.item.quote = patched_quote.quote;
-      localDbQuoteInstance.item.update_by = patched_quote.update_by;
-      localDbQuoteInstance.item.update_timestamp = Math.floor(+new Date() / 1000);
-      quotes.repo.syncronize(quotes.localDb).then(() => {
-        accept();
-      }).catch(err => {
-        reject(err)
-      });
-    } catch (err) {
-      reject(err);
-    }
-  });
+  const localDbQuoteInstance = _.find(quotes.localDb, item => item.item === existing_quote);
+  localDbQuoteInstance.item.quote = patched_quote.quote;
+  localDbQuoteInstance.item.update_by = patched_quote.update_by;
+  localDbQuoteInstance.item.update_timestamp = Math.floor(+new Date() / 1000);
+
+  return quotes.repo.syncronize(quotes.localDb);
 };

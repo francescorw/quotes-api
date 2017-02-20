@@ -5,9 +5,10 @@ const settings = require('../config/settings');
 const fs = require('fs');
 const path = require('path');
 const directory = path.dirname(settings.logging.fileName);
+
 fs.existsSync(directory) || fs.mkdirSync(directory);
 
-const logger = new(winston.Logger)({
+module.exports = new(winston.Logger)({
   transports: [
     new(winston.transports.File)({
       filename: settings.logging.fileName,
@@ -20,5 +21,3 @@ const logger = new(winston.Logger)({
     })
   ]
 });
-
-module.exports = logger;
