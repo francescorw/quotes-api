@@ -34,31 +34,24 @@ const repoFactory = (type, endpoint) => {
 };
 
 exports.load = (source) => {
-  return new Promise((accept, reject) => {
-    quotes.repo = repoFactory(source.type, source.endpoint);
+  quotes.repo = repoFactory(source.type, source.endpoint);
 
-    quotes.repo.load().then(data => {
-      quotes.localDb = data;
-      accept();
-    }).catch(() => reject(new Error('cannot load quotes')));
+  return quotes.repo.load().then(data => {
+    quotes.localDb = data;
   });
 };
 
 exports.add = (quote) => {
-  return new Promise((accept, reject) => {
-    let id = (quotes.localDb.length + 1).toString();
-    quote.id = id;
-    quote.timestamp = Math.floor(+new Date() / 1000);
-    quotes.localDb.push({
-      occurrences: 1,
-      item: quote
-    });
+  let id = (quotes.localDb.length + 1).toString();
+  quote.id = id;
+  quote.timestamp = Math.floor(+new Date() / 1000);
+  quotes.localDb.push({
+    occurrences: 1,
+    item: quote
+  });
 
-    quotes.repo.add(quote).then(() => {
-      accept(id);
-    }).catch(() => {
-      reject(new Error('cannot add quote'));
-    });
+  return quotes.repo.add(quote).then(() => {
+    return id;
   });
 };
 
@@ -110,35 +103,17 @@ exports.getById = (id) => {
 };
 
 exports.delete = (quote) => {
-  return new Promise((accept, reject) => {
-    try {
-      const localDbQuoteInstance = _.find(quotes.localDb, item => item.item === quote);
-      quotes.localDb = _.without(quotes.localDb, localDbQuoteInstance);
-      quotes.repo.syncronize(quotes.localDb).then(() => {
-        accept();
-      }).catch(err => {
-        reject(err)
-      });
-    } catch (err) {
-      reject(err);
-    }
-  });
+  const localDbQuoteInstance = _.find(quotes.localDb, item => item.item === quote);
+  quotes.localDb = _.without(quotes.localDb, localDbQuoteInstance);
+
+  return quotes.repo.syncronize(quotes.localDb);
 };
 
 exports.patch = (existing_quote, patched_quote) => {
-  return new Promise((accept, reject) => {
-    try {
-      const localDbQuoteInstance = _.find(quotes.localDb, item => item.item === existing_quote);
-      localDbQuoteInstance.item.quote = patched_quote.quote;
-      localDbQuoteInstance.item.update_by = patched_quote.update_by;
-      localDbQuoteInstance.item.update_timestamp = Math.floor(+new Date() / 1000);
-      quotes.repo.syncronize(quotes.localDb).then(() => {
-        accept();
-      }).catch(err => {
-        reject(err)
-      });
-    } catch (err) {
-      reject(err);
-    }
-  });
+  const localDbQuoteInstance = _.find(quotes.localDb, item => item.item === existing_quote);
+  localDbQuoteInstance.item.quote = patched_quote.quote;
+  localDbQuoteInstance.item.update_by = patched_quote.update_by;
+  localDbQuoteInstance.item.update_timestamp = Math.floor(+new Date() / 1000);
+
+  return quotes.repo.syncronize(quotes.localDb);
 };
