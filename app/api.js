@@ -68,12 +68,11 @@ api.post('/quotes', (req, res) => {
 api.get('/quotes/random', (req, res) => {
   const search = req.query;
 
-  if (search.type === "wildcard" && search.query) {
-    search.query = "^" + search.query.split("*").join(".*") + "$";
+  if (search.type === 'wildcard' && search.query) {
+    search.query = '^' + search.query.split('*').join('.*') + '$';
   }
 
   quotes.get(search.query).then(result => {
-
     if (_.isEmpty(result)) {
       res.status(404).json({
         message: 'quote not found'
@@ -103,7 +102,6 @@ api.get('/quotes/:id', (req, res) => {
         quote: result.quote.quote
       });
     }
-
   }).catch(() => {
     res.status(500).json({
       message: 'something bad happened'
@@ -113,7 +111,6 @@ api.get('/quotes/:id', (req, res) => {
 
 api.get('/quotes/:id/info', (req, res) => {
   quotes.getById(req.params.id).then(result => {
-
     if (_.isEmpty(result)) {
       res.status(404).json({
         message: 'quote not found'

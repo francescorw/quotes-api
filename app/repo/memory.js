@@ -15,7 +15,7 @@ module.exports = (dataSource) => {
     return new Promise((accept, reject) => {
       accept(arrayToLocalDb(dataSource));
     });
-  }
+  };
 
   this.add = (item) => {
     return new Promise((accept, reject) => {
@@ -26,7 +26,7 @@ module.exports = (dataSource) => {
         reject(err);
       }
     });
-  }
+  };
 
   this.syncronize = (target) => {
     return new Promise((accept, reject) => {
@@ -41,7 +41,7 @@ module.exports = (dataSource) => {
         reject(err);
       }
     });
-  }
+  };
 
   return repo;
 };

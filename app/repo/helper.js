@@ -8,6 +8,6 @@ exports.arrayToLocalDb = data => {
       item: quote
     };
   }));
-}
+};
 
 exports.mapDb = target => _.chain(target).map(item => item.item).sortBy(item => parseInt(item.id)).value();

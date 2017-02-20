@@ -18,7 +18,7 @@ const getLeastOccurrenceRandom = collection => {
   const chosen = _.sample(collection);
   chosen.occurrences++;
   return chosen;
-}
+};
 
 const repoFactory = (type, endpoint) => {
   switch (type) {

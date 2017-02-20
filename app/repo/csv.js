@@ -30,12 +30,12 @@ module.exports = (filePath) => {
         });
       });
     });
-  }
+  };
 
   this.add = (item) => {
     return new Promise((accept, reject) => {
       stringify([item], {
-        columns: ["timestamp", "nickname", "mask", "channel", "quote"],
+        columns: ['timestamp', 'nickname', 'mask', 'channel', 'quote'],
         eof: false
       }, (err, output) => {
         fs.appendFile(repo.filePath, '\r\n' + output, (err) => {
@@ -46,14 +46,14 @@ module.exports = (filePath) => {
         });
       });
     });
-  }
+  };
 
   this.syncronize = (target) => {
     return new Promise((accept, reject) => {
       const mappedDb = mapDb(target);
 
       stringify(mappedDb, {
-        columns: ["timestamp", "nickname", "mask", "channel", "quote"],
+        columns: ['timestamp', 'nickname', 'mask', 'channel', 'quote'],
         eof: false,
         header: true
       }, (err, output) => {
@@ -65,7 +65,7 @@ module.exports = (filePath) => {
         });
       });
     });
-  }
+  };
 
   return repo;
 };

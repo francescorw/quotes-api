@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 require('dotenv').config();
+
 const settings = require('./config/settings');
 const production = process.env.NODE_ENV === 'production';
 
@@ -16,7 +17,7 @@ app.use(bodyParser.json());
 app.use(morgan(production ? 'combined' : 'dev', {
   stream: {
     write: (str) => {
-      debug(str.trim())
+      debug(str.trim());
     },
   },
 }));

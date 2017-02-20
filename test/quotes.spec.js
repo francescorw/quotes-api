@@ -67,12 +67,12 @@ describe('quotes', () => {
       quote: 'What a save!',
       update_by: 'Psyonix',
     };
-    quotes.getById("2")
+    quotes.getById('2')
       .then(result => {
         return quotes.patch(result.quote, patched_quote);
       })
       .then(result => {
-        return quotes.getById("2");
+        return quotes.getById('2');
       })
       .then(result => {
         test.string(result.quote.quote).is(patched_quote.quote);
@@ -84,12 +84,12 @@ describe('quotes', () => {
   });
 
   it('should delete a quote', done => {
-    quotes.getById("2")
+    quotes.getById('2')
       .then(result => {
         return quotes.delete(result.quote);
       })
       .then(result => {
-        return quotes.getById("2");
+        return quotes.getById('2');
       })
       .then(result => {
         test.undefined(result);
