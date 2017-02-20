@@ -25,7 +25,7 @@ describe('quotes', () => {
     quotes.load({
       type: 'memory',
       endpoint: data
-    }).then(() => done()).catch(() => done(new Error()));
+    }).then(() => done()).catch(done);
   });
 
   it('should add new quote', done => {
@@ -38,21 +38,21 @@ describe('quotes', () => {
     quotes.add(quote).then(result => {
       test.string(result).isNotEmpty();
       done();
-    }).catch(() => done(new Error()));
+    }).catch(done);
   });
 
   it('should return random quote', done => {
     quotes.get().then(result => {
       test.string(result.quote.quote).isNotEmpty();
       done();
-    }).catch(() => done(new Error()));
+    }).catch(done);
   });
 
   it('should return a quote containing \'yeah\'', done => {
     quotes.get('(yeah)').then(result => {
       test.string(result.quote.quote).isValid(/(yeah)/);
       done();
-    }).catch(() => done(new Error()));
+    }).catch(done);
   });
 
   it('should not return a quote', done => {

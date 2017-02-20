@@ -40,7 +40,7 @@ exports.load = (source) => {
     quotes.repo.load().then(data => {
       quotes.localDb = data;
       accept();
-    }).catch(() => reject('cannot load quotes'));
+    }).catch(() => reject(new Error('cannot load quotes')));
   });
 };
 
@@ -57,7 +57,7 @@ exports.add = (quote) => {
     quotes.repo.add(quote).then(() => {
       accept(id);
     }).catch(() => {
-      reject('cannot add quote');
+      reject(new Error('cannot add quote'));
     });
   });
 };
