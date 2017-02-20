@@ -16,15 +16,16 @@ module.exports = (filePath) => {
   this.load = () => {
     return new Promise((accept, reject) => {
       fs.readFile(repo.filePath, (err, data) => {
-        if (err)
-          reject();
+        if (err) {
+          return reject(err);
+        }
 
         parse(data, {
           columns: true
         }, (err, output) => {
-          if (err)
-            reject();
-
+          if (err) {
+            return reject(err);
+          }
           accept(arrayToLocalDb(output));
         });
       });
@@ -38,9 +39,9 @@ module.exports = (filePath) => {
         eof: false
       }, (err, output) => {
         fs.appendFile(repo.filePath, '\r\n' + output, (err) => {
-          if (err)
-            reject('cannot add quote');
-
+          if (err) {
+            return reject(err);
+          }
           accept();
         });
       });
@@ -57,9 +58,9 @@ module.exports = (filePath) => {
         header: true
       }, (err, output) => {
         fs.writeFile(repo.filePath, output, (err) => {
-          if (err)
-            reject('cannot syncronize with csv source');
-
+          if (err) {
+            return reject(err);
+          }
           accept();
         });
       });
