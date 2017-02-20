@@ -57,7 +57,7 @@ describe('quotes', () => {
 
   it('should not return a quote', done => {
     quotes.get('(fdsegewq)').then(result => {
-      test.undefined(result).undefined();
+      test.undefined(result);
       done();
     }).catch(done);
   });
@@ -92,7 +92,7 @@ describe('quotes', () => {
         return quotes.getById("2");
       })
       .then(result => {
-        test.undefined(result).undefined();
+        test.undefined(result);
         done();
       })
       .catch(done);
