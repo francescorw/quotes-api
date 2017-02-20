@@ -29,22 +29,13 @@ api.get('/', (req, res) => {
 api.post('/quotes', (req, res) => {
   const quote = req.body;
   const errors = [];
+  const required = ['nickname', 'mask', 'channel', 'quote'];
 
-  if (!('nickname' in quote)) {
-    errors.push('required: nickname');
-  }
-
-  if (!('mask' in quote)) {
-    errors.push('required: mask');
-  }
-
-  if (!('channel' in quote)) {
-    errors.push('required: channel');
-  }
-
-  if (!('quote' in quote)) {
-    errors.push('required: quote');
-  }
+  _.each(required, (property) => {
+    if (!(property in quote)) {
+      errors.push('required: ' + property);
+    }
+  });
 
   if (!_.isEmpty(errors)) {
     return res.status(422).json({
@@ -157,14 +148,13 @@ api.delete('/quotes/:id', (req, res) => {
 api.patch('/quotes/:id', (req, res) => {
   const patched_quote = req.body;
   const errors = [];
+  const required = ['quote', 'update_by'];
 
-  if (!('quote' in patched_quote)) {
-    errors.push('required: quote');
-  }
-
-  if (!('update_by' in patched_quote)) {
-    errors.push('required: update_by');
-  }
+  _.each(required, (property) => {
+    if (!(property in patched_quote)) {
+      errors.push('required: ' + property);
+    }
+  });
 
   if (!_.isEmpty(errors)) {
     return res.status(422).json({
