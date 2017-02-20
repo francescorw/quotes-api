@@ -34,7 +34,11 @@ const repoFactory = (type, endpoint) => {
 };
 
 exports.load = (source) => {
-  quotes.repo = repoFactory(source.type, source.endpoint);
+  try {
+    quotes.repo = repoFactory(source.type, source.endpoint);
+  } catch (err) {
+    return Promise.reject(err);
+  }
 
   return quotes.repo.load().then(data => {
     quotes.localDb = data;
@@ -42,16 +46,16 @@ exports.load = (source) => {
 };
 
 exports.add = (quote) => {
-  let id = (quotes.localDb.length + 1).toString();
-  quote.id = id;
+  quote.id = (quotes.localDb.length + 1).toString();
   quote.timestamp = Math.floor(+new Date() / 1000);
+
   quotes.localDb.push({
     occurrences: 1,
     item: quote
   });
 
   return quotes.repo.add(quote).then(() => {
-    return id;
+    return quote.id;
   });
 };
 
@@ -80,14 +84,10 @@ exports.get = (pattern) => {
   });
 };
 
-const getById = id => {
-  return _.find(quotes.localDb, (quote) => quote.item.id === id);
-};
-
 exports.getById = (id) => {
   return new Promise((accept, reject) => {
     try {
-      const quote = getById(id);
+      const quote = _.find(quotes.localDb, (quote) => quote.item.id === id);
 
       if (quote === undefined) {
         accept();
