@@ -10,4 +10,9 @@ exports.arrayToLocalDb = data => {
   }));
 };
 
-exports.mapDb = target => _.chain(target).map(item => item.item).sortBy(item => parseInt(item.id)).value();
+exports.mapDb = target => {
+  return _.chain(target)
+    .map(item => item.item)
+    .sortBy(item => parseInt(item.id))
+    .value();
+};
