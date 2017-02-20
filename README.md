@@ -65,6 +65,21 @@ Response - HTTP 200
 }
 ```
 
+### PATCH /quotes/:id
+Request
+```json
+{
+      "quote": "<jack_ass> we have to go back... <jack_ass> back to the future!",
+      "update_by": "Emmett Brown"
+}
+```
+Response - HTTP 200
+```json
+{
+      "success": true
+}
+```
+
 ### DELETE /quotes/:id
 Response - HTTP 200
 ```json
