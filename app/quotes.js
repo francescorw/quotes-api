@@ -7,17 +7,11 @@ this.localDb = [];
 this.repo = require('./repo/memory')([]);
 
 const getLeastOccurrenceRandom = collection => {
-  collection = _.sortBy(collection, quote => quote.occurrences);
-  const first = _.first(collection);
-  collection = _.filter(collection, quote => quote.occurrences == first.occurrences);
-
   if (_.isEmpty(collection)) {
     return;
   }
 
-  const chosen = _.sample(collection);
-  chosen.occurrences++;
-  return chosen;
+  return _.sample(collection);
 };
 
 const repoFactory = (type, endpoint) => {
@@ -50,7 +44,6 @@ exports.add = (quote) => {
   quote.timestamp = Math.floor(+new Date() / 1000);
 
   quotes.localDb.push({
-    occurrences: 1,
     item: quote
   });
 
