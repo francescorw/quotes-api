@@ -57,7 +57,7 @@ exports.get = (pattern) => {
     try {
       let subset = quotes.localDb;
       if (pattern) {
-        const re = new RegExp(pattern);
+        const re = new RegExp(pattern, 'i');
         subset = _.filter(subset, (quote) => re.test(quote.item.quote));
       }
 

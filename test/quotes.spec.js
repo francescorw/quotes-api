@@ -58,6 +58,13 @@ describe('quotes', () => {
       }).catch(done);
     });
 
+    it('returns the correct quote when given a pattern (case insensitive)', done => {
+      quotes.get('(Yeah)').then(result => {
+        test.string(result.quote.quote).isValid(/(yeah)/);
+        done();
+      }).catch(done);
+    });
+
     it('does not return a quote when no matching quotes exist', done => {
       quotes.get('(fdsegewq)').then(result => {
         test.undefined(result);
