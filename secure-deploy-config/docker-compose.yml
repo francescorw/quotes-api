@@ -1,0 +1,43 @@
+version: "3.3"
+services:
+  nginx:
+    container_name: 'nginx-service'
+    build:
+      context: .
+      dockerfile: docker/nginx.Dockerfile
+    ports:
+      - 4080:80
+      - 4443:443
+    volumes:
+      - ./config:/config
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /tmp/acme_challenge:/tmp/acme_challenge
+    networks:
+      - quotes-api
+    restart: always
+  redis:
+    image: redis:alpine
+    volumes:
+      - ../redis-data:/data
+    ports:
+      - "6379"
+    networks:
+      - quotes-api
+  quotes-api:
+    image: francescorw/quotes-api:1.0
+    depends_on: [redis]
+    ports:
+        - 18111:18111
+    networks:
+      - quotes-api
+    restart: always
+    environment:
+      - DEBUG
+      - PORT
+      - DBTYPE
+      - NODE_ENV
+      - DBENDPOINT=redis:6379
+
+networks:
+  quotes-api:
+    driver: bridge

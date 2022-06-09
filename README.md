@@ -8,6 +8,11 @@ Firing it up
 npm start
 ```
 
+## Building docker image
+```
+docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t <username>/<image-name>:<tag> --push .
+```
+
 HTTP API
 --------
 

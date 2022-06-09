@@ -1,0 +1,27 @@
+version: "3.8"
+services:
+  redis:
+    image: redis:alpine
+    volumes:
+      - ./redis-data:/data
+    ports:
+      - "6379"
+    networks:
+      - quotes-api
+  quotes-api:
+    image: francescorw/quotes-api:1.0
+    depends_on: [redis]
+    ports:
+        - 18111:18111
+    networks:
+      - quotes-api
+    restart: always
+    environment:
+      - DEBUG
+      - PORT
+      - DBTYPE
+      - NODE_ENV
+      - DBENDPOINT=redis:6379
+
+networks:
+    quotes-api:

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-require('dotenv').config();
+require('dotenv').config({silent: true});
 
 const settings = require('./config/settings');
 const production = process.env.NODE_ENV === 'production';
